@@ -19,6 +19,11 @@ use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
+use App\Orchid\Screens\TaskInfoScreen;
+use App\Orchid\Screens\TaskEditScreen;
+use App\Orchid\Screens\TaskListScreen;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -102,3 +107,12 @@ Route::screen('/examples/charts', ExampleChartsScreen::class)->name('platform.ex
 Route::screen('/examples/cards', ExampleCardsScreen::class)->name('platform.example.cards');
 
 //Route::screen('idea', Idea::class, 'platform.screens.idea');
+
+Route::screen('task/info/{task}', TaskInfoScreen::class)
+    ->name('platform.task.info');
+
+Route::screen('task/{task?}', TaskEditScreen::class)
+    ->name('platform.task');
+
+Route::screen('tasks', TaskListScreen::class)
+    ->name('platform.tasks');
