@@ -89,6 +89,19 @@ class PlatformProvider extends OrchidServiceProvider
                 ->url('https://github.com/orchidsoftware/platform/blob/master/CHANGELOG.md')
                 ->target('_blank')
                 ->badge(fn () => Dashboard::version(), Color::DARK),
+
+            Menu::make('Создание заметки')
+                ->icon('star')
+                ->route('platform.task.create')
+                ->title('Tools'),
+
+            Menu::make('Просмотр заметок')
+                ->icon('star')
+                ->route('platform.task.list'),
+
+            Menu::make('Редактирование заметки')
+                ->icon('star')
+                ->route('platform.task.edit')
         ];
     }
 
