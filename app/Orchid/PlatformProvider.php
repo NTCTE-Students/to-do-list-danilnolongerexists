@@ -90,18 +90,9 @@ class PlatformProvider extends OrchidServiceProvider
                 ->target('_blank')
                 ->badge(fn () => Dashboard::version(), Color::DARK),
 
-            Menu::make('Создание заметки')
-                ->icon('star')
-                ->route('platform.task.create')
-                ->title('Tools'),
-
             Menu::make('Просмотр заметок')
                 ->icon('star')
-                ->route('platform.task.list'),
-
-            Menu::make('Редактирование заметки')
-                ->icon('star')
-                ->route('platform.task.edit')
+                ->route('platform.tasks'),
         ];
     }
 

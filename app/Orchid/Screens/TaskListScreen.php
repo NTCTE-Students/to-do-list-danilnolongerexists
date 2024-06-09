@@ -2,10 +2,11 @@
 
 namespace App\Orchid\Screens;
 
-use App\Orchid\Layouts\TaskListLayout;
 use App\Models\Task;
-use Orchid\Screen\Actions\Link;
 use Orchid\Screen\Screen;
+use Orchid\Screen\TD;
+use Orchid\Support\Facades\Layout;
+use Orchid\Screen\Actions\Link;
 
 class TaskListScreen extends Screen
 {
@@ -14,10 +15,10 @@ class TaskListScreen extends Screen
      *
      * @return array
      */
-    public function query(): array
+    public function query(): iterable
     {
         return [
-            'posts' => Task::paginate()
+            'tasks' => Task::all(),
         ];
     }
 
@@ -28,7 +29,7 @@ class TaskListScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'TaskListScreen';
+        return 'Tasks';
     }
 
     /**
@@ -41,7 +42,7 @@ class TaskListScreen extends Screen
         return [
             Link::make('Создать новую')
             ->icon('pencil')
-            ->route('platform.task.edit')
+            ->route('platform.task')
         ];
     }
 
@@ -50,10 +51,28 @@ class TaskListScreen extends Screen
      *
      * @return \Orchid\Screen\Layout[]|string[]
      */
-    public function layout(): array
+    public function layout(): iterable
     {
         return [
-            TaskListLayout::class
+            Layout::table('tasks', [
+                TD::make('title')
+                    ->render(function (Task $task) {
+                        return Link::make($task->title)
+                            ->route('platform.task', $task);
+                    }),
+                TD::make('completed')
+                    ->render(function (Task $task) {
+                        return $task->completed ? 'Выполнено' : 'Не выполнено';
+                    },
+                ),
+                TD::make('created_at'),
+                TD::make('updated_at'),
+                TD::make('more')
+                    ->render(function (Task $task) {
+                        return Link::make('Подробнее')
+                            ->route('platform.task.info', $task);
+                    }),
+            ]),
         ];
     }
 }

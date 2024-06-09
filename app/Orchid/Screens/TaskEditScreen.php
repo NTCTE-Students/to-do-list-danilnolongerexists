@@ -2,19 +2,14 @@
 
 namespace App\Orchid\Screens;
 
-use App\Models\Post;
 use App\Models\Task;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Orchid\Screen\Fields\Input;
-use Orchid\Screen\Fields\Quill;
-use Orchid\Screen\Fields\Relation;
-use Orchid\Screen\Fields\TextArea;
-use Orchid\Screen\Fields\Upload;
-use Orchid\Support\Facades\Layout;
-use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Action;
+use Orchid\Screen\Fields\CheckBox;
 use Orchid\Screen\Screen;
-use Orchid\Support\Facades\Alert;
+use Illuminate\Http\Request;
+use Orchid\Screen\Actions\Button;
+use Orchid\Screen\Fields\Input;
+use Orchid\Support\Facades\Layout;
 
 class TaskEditScreen extends Screen
 {
@@ -24,11 +19,10 @@ class TaskEditScreen extends Screen
     /**
      * Fetch data to be displayed on the screen.
      *
-     * @param Task $task
      *
      * @return array
      */
-    public function query(Task $task): array
+    public function query(Task $task): iterable
     {
         return [
             'task' => $task
@@ -38,19 +32,11 @@ class TaskEditScreen extends Screen
     /**
      * The name of the screen displayed in the header.
      *
-     * @return string|null
+     *
      */
     public function name(): ?string
     {
         return $this->task->exists ? 'Редактирование заметки' : 'Cоздание новой заметки';
-    }
-
-    /**
-     * The description is displayed on the user's screen under the heading
-     */
-    public function description(): ?string
-    {
-        return "Заметки";
     }
 
     /**
@@ -61,18 +47,19 @@ class TaskEditScreen extends Screen
     public function commandBar(): array
     {
         return [
-            Button::make('Create post')
-                ->icon('pencil')
-                ->method('createOrUpdate')
+            Button::make('Create')
+                ->icon('star')
+                ->method('create')
                 ->canSee(!$this->task->exists),
 
-            Button::make('Update')
-                ->icon('note')
-                ->method('createOrUpdate')
+            Button::make('Save')
+                ->icon('star')
+                ->method('save')
                 ->canSee($this->task->exists),
 
             Button::make('Remove')
-                ->icon('trash')
+                ->icon('star')
+                ->confirm('Вы точно хотите удалить заметку?')
                 ->method('remove')
                 ->canSee($this->task->exists),
         ];
@@ -81,39 +68,45 @@ class TaskEditScreen extends Screen
     /**
      * The screen's layout elements.
      *
-     * @return \Orchid\Screen\Layout[]|string[]
+     * @return \Orchid\Screen\Layout[]
      */
     public function layout(): array
     {
         return [
             Layout::rows([
-                Input::make('task')
+                Input::make('task.title')
                     ->title('Заметка')
                     ->required()
                     ->placeholder('Напишите заметку...'),
 
-                Quill::make('content')
+                Input::make('task.description')
                     ->title('Описание')
                     ->required()
-                    ->placeholder('Напишите здесь текст заметки...')
+                    ->placeholder('Напишите здесь текст заметки...'),
+
+                CheckBox::make('task.completed')
+                    ->sendTrueOrFalse()
+                    ->title('Completed'),
             ])
         ];
     }
 
-    public function createOrUpdate(Request $request)
+    public function create(Request $request)
     {
-        $this->task->fill($request->get('post'))->save();
+        $task = new Task();
+        $task->fill($request->get('task'));
+        $task->save();
+        return redirect()->route('platform.tasks');
+    }
 
-        Alert::info('Вы успешно создали пост.');
-
-        return redirect()->route('platform.task.list');
+    public function save(Request $request)
+    {
+        $this->task->fill($request->get('task'));
+        $this->task->save();
+        return redirect()->route('platform.tasks');
     }
     public function remove()
     {
         $this->task->delete();
-
-        Alert::info('Вы успешно удалили пост.');
-
-        return redirect()->route('platform.task.list');
     }
 }
